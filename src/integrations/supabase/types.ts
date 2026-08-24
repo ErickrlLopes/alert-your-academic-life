@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          description: string
+          due_date: string
+          due_time: string
+          id: string
+          priority: Database["public"]["Enums"]["activity_priority"]
+          subject: string
+          title: string
+          type: Database["public"]["Enums"]["activity_type"]
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string
+          due_date: string
+          due_time?: string
+          id?: string
+          priority?: Database["public"]["Enums"]["activity_priority"]
+          subject?: string
+          title: string
+          type?: Database["public"]["Enums"]["activity_type"]
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string
+          due_date?: string
+          due_time?: string
+          id?: string
+          priority?: Database["public"]["Enums"]["activity_priority"]
+          subject?: string
+          title?: string
+          type?: Database["public"]["Enums"]["activity_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string
+          id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +85,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      activity_priority: "baixa" | "media" | "alta"
+      activity_type:
+        | "trabalho"
+        | "prova"
+        | "seminario"
+        | "exercicio"
+        | "projeto"
+        | "apresentacao"
+        | "outro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +220,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      activity_priority: ["baixa", "media", "alta"],
+      activity_type: [
+        "trabalho",
+        "prova",
+        "seminario",
+        "exercicio",
+        "projeto",
+        "apresentacao",
+        "outro",
+      ],
+    },
   },
 } as const

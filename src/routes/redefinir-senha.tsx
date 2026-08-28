@@ -132,7 +132,7 @@ function ResetPasswordPage() {
           <button
             type="button"
             className="w-full pt-1 text-sm font-semibold text-primary hover:underline"
-            onClick={() => navigate({ to: "/" })}
+            onClick={() => navigate({ to: "/entrar" })}
           >
             Voltar para o login
           </button>

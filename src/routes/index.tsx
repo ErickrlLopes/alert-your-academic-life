@@ -1,219 +1,93 @@
-import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { BellRing, CalendarClock, CheckCircle2 } from "lucide-react";
 import { useSession } from "@/hooks/useSession";
 import { BrandMark } from "@/components/BrandMark";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Entrar no AlertCampus — Painel acadêmico do estudante" },
+      { title: "AlertCampus — Organize sua vida acadêmica" },
       {
         name: "description",
         content:
-          "Acesse o AlertCampus para acompanhar prazos, atividades pendentes e entregas atrasadas da sua vida acadêmica.",
+          "AlertCampus reúne trabalhos, provas e seminários em um painel único, com alertas de prazos e controle de entregas atrasadas.",
       },
-      { property: "og:title", content: "Entrar no AlertCampus" },
+      { property: "og:title", content: "AlertCampus — Organize sua vida acadêmica" },
       {
         property: "og:description",
         content: "Organize. Planeje. Receba alertas. Conquiste.",
       },
     ],
   }),
-  component: LoginPage,
+  component: WelcomePage,
 });
 
-type Mode = "login" | "signup" | "reset";
+const highlights = [
+  {
+    icon: CalendarClock,
+    title: "Prazos sob controle",
+    text: "Trabalhos, provas e seminários organizados por data de entrega.",
+  },
+  {
+    icon: BellRing,
+    title: "Alertas do que importa",
+    text: "Veja o que vence hoje e o que já ficou atrasado logo na abertura.",
+  },
+  {
+    icon: CheckCircle2,
+    title: "Conclusão rápida",
+    text: "Marque como concluída e acompanhe sua evolução no semestre.",
+  },
+];
 
-function LoginPage() {
+function WelcomePage() {
   const navigate = useNavigate();
   const { session, loading } = useSession();
-  const [mode, setMode] = useState<Mode>("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!loading && session) navigate({ to: "/painel", replace: true });
   }, [loading, session, navigate]);
 
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    setError("");
-
-    if (!email.trim() || !email.includes("@")) {
-      setError("Informe um e-mail válido.");
-      return;
-    }
-
-    setBusy(true);
-    try {
-      if (mode === "reset") {
-        const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-          redirectTo: `${window.location.origin}/redefinir-senha`,
-        });
-        if (err) throw err;
-        toast.success("Enviamos um link de recuperação para o seu e-mail.");
-        setMode("login");
-        return;
-      }
-
-      if (password.length < 6) {
-        setError("A senha deve ter pelo menos 6 caracteres.");
-        return;
-      }
-
-      if (mode === "signup") {
-        const { data, error: err } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { full_name: name.trim() },
-          },
-        });
-        if (err) throw err;
-        if (!data.session) {
-          toast.success("Conta criada! Confirme o e-mail para entrar.");
-          setMode("login");
-        }
-        return;
-      }
-
-      const { error: err } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-      if (err) throw err;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Não foi possível continuar.";
-      setError(
-        message.includes("Invalid login credentials")
-          ? "E-mail ou senha inválidos. Tente novamente."
-          : message,
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
-    <main className="flex min-h-screen items-center justify-center px-5 py-12">
-      <div className="w-full max-w-sm">
-        <header className="mb-8 flex flex-col items-center text-center">
-          <BrandMark size={76} />
-          <h1 className="mt-5 text-3xl font-extrabold tracking-tight">
-            <span className="text-gradient-brand">Alert</span>Campus
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Organize. Planeje. Receba alertas. Conquiste.
-          </p>
-        </header>
+    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-between px-6 py-12">
+      <section className="flex flex-1 flex-col items-center justify-center text-center">
+        <BrandMark size={104} />
+        <h1 className="mt-7 text-4xl font-extrabold tracking-tight">
+          <span className="text-gradient-brand">Alert</span>Campus
+        </h1>
+        <p className="mt-3 text-base text-muted-foreground">
+          Organize. Planeje. Receba alertas. Conquiste.
+        </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 rounded-3xl border border-border bg-card p-6 shadow-brand"
-        >
-          <h2 className="text-lg font-bold">
-            {mode === "login"
-              ? "Entrar"
-              : mode === "signup"
-                ? "Criar conta"
-                : "Recuperar senha"}
-          </h2>
+        <ul className="mt-10 w-full space-y-3 text-left">
+          {highlights.map(({ icon: Icon, title, text }) => (
+            <li
+              key={title}
+              className="flex gap-3 rounded-2xl border border-border bg-card p-4"
+            >
+              <Icon className="mt-0.5 size-5 shrink-0 text-primary" />
+              <div>
+                <p className="text-sm font-bold">{title}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-          {mode === "signup" ? (
-            <div className="space-y-1.5">
-              <Label htmlFor="name">Nome</Label>
-              <Input
-                id="name"
-                maxLength={80}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Seu nome"
-              />
-            </div>
-          ) : null}
-
-          <div className="space-y-1.5">
-            <Label htmlFor="email">E-mail</Label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              maxLength={255}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="estudante@email.com"
-            />
-          </div>
-
-          {mode !== "reset" ? (
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete={mode === "login" ? "current-password" : "new-password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-              />
-            </div>
-          ) : null}
-
-          {error ? (
-            <p role="alert" className="text-sm font-medium text-destructive">
-              {error}
-            </p>
-          ) : null}
-
-          <Button type="submit" className="w-full" disabled={busy}>
-            {busy
-              ? "Aguarde..."
-              : mode === "login"
-                ? "Entrar"
-                : mode === "signup"
-                  ? "Criar conta"
-                  : "Enviar link de recuperação"}
-          </Button>
-
-          <div className="flex flex-col items-center gap-2 pt-1 text-sm">
-            {mode === "login" ? (
-              <>
-                <button
-                  type="button"
-                  className="text-muted-foreground hover:text-foreground"
-                  onClick={() => setMode("reset")}
-                >
-                  Esqueci minha senha
-                </button>
-                <button
-                  type="button"
-                  className="font-semibold text-primary hover:underline"
-                  onClick={() => setMode("signup")}
-                >
-                  Criar conta
-                </button>
-              </>
-            ) : (
-              <button
-                type="button"
-                className="font-semibold text-primary hover:underline"
-                onClick={() => setMode("login")}
-              >
-                Voltar para o login
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
+      <footer className="mt-10 space-y-3">
+        <Button asChild className="h-12 w-full bg-gradient-brand text-base font-bold text-primary-foreground shadow-brand">
+          <Link to="/entrar">Começar agora</Link>
+        </Button>
+        <p className="text-center text-xs text-muted-foreground">
+          Já tem conta?{" "}
+          <Link to="/entrar" className="font-semibold text-primary hover:underline">
+            Entrar
+          </Link>
+        </p>
+      </footer>
     </main>
   );
 }

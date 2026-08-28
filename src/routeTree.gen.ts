@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EntrarRouteImport } from './routes/entrar'
+import { Route as InicioRouteImport } from './routes/inicio'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 
@@ -22,6 +23,11 @@ const IndexRoute = IndexRouteImport.update({
 const EntrarRoute = EntrarRouteImport.update({
   id: '/entrar',
   path: '/entrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InicioRoute = InicioRouteImport.update({
+  id: '/inicio',
+  path: '/inicio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PainelRoute = PainelRouteImport.update({
@@ -38,12 +44,14 @@ const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/entrar': typeof EntrarRoute
+  '/inicio': typeof InicioRoute
   '/painel': typeof PainelRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/entrar': typeof EntrarRoute
+  '/inicio': typeof InicioRoute
   '/painel': typeof PainelRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
 }
@@ -51,20 +59,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/entrar': typeof EntrarRoute
+  '/inicio': typeof InicioRoute
   '/painel': typeof PainelRoute
   '/redefinir-senha': typeof RedefinirSenhaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/entrar' | '/painel' | '/redefinir-senha'
+  fullPaths: '/' | '/entrar' | '/inicio' | '/painel' | '/redefinir-senha'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/entrar' | '/painel' | '/redefinir-senha'
-  id: '__root__' | '/' | '/entrar' | '/painel' | '/redefinir-senha'
+  to: '/' | '/entrar' | '/inicio' | '/painel' | '/redefinir-senha'
+  id: '__root__' | '/' | '/entrar' | '/inicio' | '/painel' | '/redefinir-senha'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EntrarRoute: typeof EntrarRoute
+  InicioRoute: typeof InicioRoute
   PainelRoute: typeof PainelRoute
   RedefinirSenhaRoute: typeof RedefinirSenhaRoute
 }
@@ -83,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/entrar'
       fullPath: '/entrar'
       preLoaderRoute: typeof EntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inicio': {
+      id: '/inicio'
+      path: '/inicio'
+      fullPath: '/inicio'
+      preLoaderRoute: typeof InicioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/painel': {
@@ -105,6 +122,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EntrarRoute: EntrarRoute,
+  InicioRoute: InicioRoute,
   PainelRoute: PainelRoute,
   RedefinirSenhaRoute: RedefinirSenhaRoute,
 }

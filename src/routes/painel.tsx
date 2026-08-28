@@ -43,7 +43,7 @@ function PainelPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (!loading && !session) navigate({ to: "/", replace: true });
+    if (!loading && !session) navigate({ to: "/entrar", replace: true });
   }, [loading, session, navigate]);
 
   const { data: profile } = useQuery({
@@ -136,7 +136,7 @@ function PainelPage() {
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
-    navigate({ to: "/", replace: true });
+    navigate({ to: "/entrar", replace: true });
   }
 
   const firstName = (profile?.full_name || user?.email?.split("@")[0] || "estudante")

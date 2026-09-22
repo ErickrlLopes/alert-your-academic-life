@@ -31,13 +31,13 @@ export function ActivityCard({
       className={cn(
         "relative overflow-hidden rounded-2xl border border-border bg-card p-4 pl-5 transition-colors",
         status === "atrasada" && "border-destructive/50",
-        activity.completed && "opacity-60",
+        activity.concluida && "opacity-60",
       )}
     >
       <span
         className={cn(
           "absolute inset-y-0 left-0 w-1.5",
-          priorityBar[activity.priority] ?? "bg-accent",
+          priorityBar[activity.prioridade] ?? "bg-accent",
         )}
         aria-hidden
       />
@@ -45,25 +45,25 @@ export function ActivityCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-            {activity.subject || "Sem disciplina"}
+            {activity.disciplina || "Sem disciplina"}
           </p>
           <h4
             className={cn(
               "mt-1 font-bold leading-tight",
-              activity.completed && "line-through",
+              activity.concluida && "line-through",
             )}
           >
-            {activity.title}
+            {activity.titulo}
           </h4>
         </div>
         <span className="shrink-0 rounded-full bg-secondary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary-foreground">
-          {typeLabel(activity.type)}
+          {typeLabel(activity.tipo)}
         </span>
       </div>
 
-      {activity.description ? (
+      {activity.descricao ? (
         <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-          {activity.description}
+          {activity.descricao}
         </p>
       ) : null}
 
@@ -81,18 +81,18 @@ export function ActivityCard({
           {status === "concluida" ? "Concluída" : formatDue(activity)}
         </span>
         <span className="text-muted-foreground">
-          Prioridade {priorityLabel(activity.priority).toLowerCase()}
+          Prioridade {priorityLabel(activity.prioridade).toLowerCase()}
         </span>
       </div>
 
       <div className="mt-4 flex gap-2">
         <Button
           size="sm"
-          variant={activity.completed ? "secondary" : "default"}
+          variant={activity.concluida ? "secondary" : "default"}
           className="flex-1"
           onClick={() => onToggle(activity)}
         >
-          {activity.completed ? (
+          {activity.concluida ? (
             <>
               <RotateCcw /> Reabrir
             </>
@@ -107,7 +107,7 @@ export function ActivityCard({
           variant="ghost"
           className="text-muted-foreground hover:text-destructive"
           onClick={() => onDelete(activity)}
-          aria-label={`Excluir ${activity.title}`}
+          aria-label={`Excluir ${activity.titulo}`}
         >
           <Trash2 />
         </Button>

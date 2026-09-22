@@ -1,35 +1,37 @@
-CREATE TYPE public.activity_type AS ENUM ('trabalho','prova','seminario','exercicio','projeto','apresentacao','outro');
-CREATE TYPE public.activity_priority AS ENUM ('baixa','media','alta');
+-- AlertCampus — banco de dados (PostgreSQL / Supabase) com nomes em português
 
-CREATE TABLE public.profiles (
+CREATE TYPE public.tipo_atividade AS ENUM ('trabalho','prova','seminario','exercicio','projeto','apresentacao','outro');
+CREATE TYPE public.prioridade_atividade AS ENUM ('baixa','media','alta');
+
+CREATE TABLE public.perfis (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  full_name TEXT NOT NULL DEFAULT '',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  nome_completo TEXT NOT NULL DEFAULT '',
+  criado_em TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
-GRANT ALL ON public.profiles TO service_role;
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "own profile" ON public.profiles FOR ALL TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.perfis TO authenticated;
+GRANT ALL ON public.perfis TO service_role;
+ALTER TABLE public.perfis ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "proprio perfil" ON public.perfis FOR ALL TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 
-CREATE TABLE public.activities (
+CREATE TABLE public.atividades (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  description TEXT NOT NULL DEFAULT '',
-  subject TEXT NOT NULL DEFAULT '',
-  type public.activity_type NOT NULL DEFAULT 'trabalho',
-  priority public.activity_priority NOT NULL DEFAULT 'media',
-  due_date DATE NOT NULL,
-  due_time TIME NOT NULL DEFAULT '23:59',
-  completed BOOLEAN NOT NULL DEFAULT false,
-  completed_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  usuario_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  titulo TEXT NOT NULL,
+  descricao TEXT NOT NULL DEFAULT '',
+  disciplina TEXT NOT NULL DEFAULT '',
+  tipo public.tipo_atividade NOT NULL DEFAULT 'trabalho',
+  prioridade public.prioridade_atividade NOT NULL DEFAULT 'media',
+  data_entrega DATE NOT NULL,
+  hora_entrega TIME NOT NULL DEFAULT '23:59',
+  concluida BOOLEAN NOT NULL DEFAULT false,
+  concluida_em TIMESTAMPTZ,
+  criado_em TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.activities TO authenticated;
-GRANT ALL ON public.activities TO service_role;
-ALTER TABLE public.activities ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "own activities" ON public.activities FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-CREATE INDEX activities_user_due_idx ON public.activities (user_id, due_date);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.atividades TO authenticated;
+GRANT ALL ON public.atividades TO service_role;
+ALTER TABLE public.atividades ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "proprias atividades" ON public.atividades FOR ALL TO authenticated USING (auth.uid() = usuario_id) WITH CHECK (auth.uid() = usuario_id);
+CREATE INDEX atividades_usuario_entrega_idx ON public.atividades (usuario_id, data_entrega);
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
@@ -38,7 +40,7 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name)
+  INSERT INTO public.perfis (id, nome_completo)
   VALUES (NEW.id, COALESCE(NEW.raw_user_meta_data->>'full_name', ''))
   ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
@@ -47,4 +49,6 @@ $$;
 
 CREATE TRIGGER on_auth_user_created
 AFTER INSERT ON auth.users
-FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
+FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;

@@ -19,17 +19,17 @@ export type Priority = (typeof PRIORITIES)[number]["value"];
 
 export type Activity = {
   id: string;
-  user_id: string;
-  title: string;
-  description: string;
-  subject: string;
-  type: ActivityType;
-  priority: Priority;
-  due_date: string;
-  due_time: string;
-  completed: boolean;
-  completed_at: string | null;
-  created_at: string;
+  usuario_id: string;
+  titulo: string;
+  descricao: string;
+  disciplina: string;
+  tipo: ActivityType;
+  prioridade: Priority;
+  data_entrega: string;
+  hora_entrega: string;
+  concluida: boolean;
+  concluida_em: string | null;
+  criado_em: string;
 };
 
 export type ActivityStatus = "pendente" | "concluida" | "atrasada";
@@ -49,16 +49,16 @@ function todayISO() {
 }
 
 export function statusOf(activity: Activity): ActivityStatus {
-  if (activity.completed) return "concluida";
-  return activity.due_date < todayISO() ? "atrasada" : "pendente";
+  if (activity.concluida) return "concluida";
+  return activity.data_entrega < todayISO() ? "atrasada" : "pendente";
 }
 
 export function isToday(activity: Activity) {
-  return !activity.completed && activity.due_date === todayISO();
+  return !activity.concluida && activity.data_entrega === todayISO();
 }
 
 export function isUpcoming(activity: Activity) {
-  return !activity.completed && activity.due_date > todayISO();
+  return !activity.concluida && activity.data_entrega > todayISO();
 }
 
 export function isLate(activity: Activity) {
@@ -67,12 +67,12 @@ export function isLate(activity: Activity) {
 
 export function formatDue(activity: Activity) {
   const today = todayISO();
-  const [y, m, d] = activity.due_date.split("-").map(Number);
+  const [y, m, d] = activity.data_entrega.split("-").map(Number);
   const date = new Date(y!, (m ?? 1) - 1, d ?? 1);
   const diffDays = Math.round(
     (date.getTime() - new Date(today + "T00:00:00").getTime()) / 86400000,
   );
-  const hour = activity.due_time.slice(0, 5);
+  const hour = activity.hora_entrega.slice(0, 5);
 
   if (diffDays === 0) return `Hoje às ${hour}`;
   if (diffDays === 1) return `Amanhã às ${hour}`;
@@ -83,5 +83,5 @@ export function formatDue(activity: Activity) {
 }
 
 export function sortByDue(a: Activity, b: Activity) {
-  return (a.due_date + a.due_time).localeCompare(b.due_date + b.due_time);
+  return (a.data_entrega + a.hora_entrega).localeCompare(b.data_entrega + b.hora_entrega);
 }

@@ -21,23 +21,23 @@ import {
 import { ACTIVITY_TYPES, PRIORITIES, type ActivityType, type Priority } from "@/lib/activities";
 
 export type ActivityDraft = {
-  title: string;
-  description: string;
-  subject: string;
-  type: ActivityType;
-  priority: Priority;
-  due_date: string;
-  due_time: string;
+  titulo: string;
+  descricao: string;
+  disciplina: string;
+  tipo: ActivityType;
+  prioridade: Priority;
+  data_entrega: string;
+  hora_entrega: string;
 };
 
 const empty: ActivityDraft = {
-  title: "",
-  description: "",
-  subject: "",
-  type: "trabalho",
-  priority: "media",
-  due_date: "",
-  due_time: "23:59",
+  titulo: "",
+  descricao: "",
+  disciplina: "",
+  tipo: "trabalho",
+  prioridade: "media",
+  data_entrega: "",
+  hora_entrega: "23:59",
 };
 
 export function ActivityDialog({
@@ -56,18 +56,22 @@ export function ActivityDialog({
 
   useEffect(() => {
     if (open) {
-      setDraft({ ...empty, due_date: new Date().toISOString().slice(0, 10) });
+      setDraft({ ...empty, data_entrega: new Date().toISOString().slice(0, 10) });
       setError("");
     }
   }, [open]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (!draft.title.trim()) return setError("Informe o título da atividade.");
-    if (draft.title.length > 120) return setError("O título é muito longo.");
-    if (!draft.due_date) return setError("Informe a data de entrega.");
+    if (!draft.titulo.trim()) return setError("Informe o título da atividade.");
+    if (draft.titulo.length > 120) return setError("O título é muito longo.");
+    if (!draft.data_entrega) return setError("Informe a data de entrega.");
     setError("");
-    await onSubmit({ ...draft, title: draft.title.trim(), subject: draft.subject.trim() });
+    await onSubmit({
+      ...draft,
+      titulo: draft.titulo.trim(),
+      disciplina: draft.disciplina.trim(),
+    });
   }
 
   return (
@@ -82,23 +86,23 @@ export function ActivityDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="title">Título</Label>
+            <Label htmlFor="titulo">Título</Label>
             <Input
-              id="title"
+              id="titulo"
               maxLength={120}
-              value={draft.title}
-              onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+              value={draft.titulo}
+              onChange={(e) => setDraft({ ...draft, titulo: e.target.value })}
               placeholder="Trabalho de Modelagem"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="subject">Disciplina</Label>
+            <Label htmlFor="disciplina">Disciplina</Label>
             <Input
-              id="subject"
+              id="disciplina"
               maxLength={80}
-              value={draft.subject}
-              onChange={(e) => setDraft({ ...draft, subject: e.target.value })}
+              value={draft.disciplina}
+              onChange={(e) => setDraft({ ...draft, disciplina: e.target.value })}
               placeholder="Banco de Dados"
             />
           </div>
@@ -107,8 +111,8 @@ export function ActivityDialog({
             <div className="space-y-1.5">
               <Label>Tipo</Label>
               <Select
-                value={draft.type}
-                onValueChange={(value) => setDraft({ ...draft, type: value as ActivityType })}
+                value={draft.tipo}
+                onValueChange={(value) => setDraft({ ...draft, tipo: value as ActivityType })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -126,8 +130,8 @@ export function ActivityDialog({
             <div className="space-y-1.5">
               <Label>Prioridade</Label>
               <Select
-                value={draft.priority}
-                onValueChange={(value) => setDraft({ ...draft, priority: value as Priority })}
+                value={draft.prioridade}
+                onValueChange={(value) => setDraft({ ...draft, prioridade: value as Priority })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -145,33 +149,33 @@ export function ActivityDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="due_date">Data de entrega</Label>
+              <Label htmlFor="data_entrega">Data de entrega</Label>
               <Input
-                id="due_date"
+                id="data_entrega"
                 type="date"
-                value={draft.due_date}
-                onChange={(e) => setDraft({ ...draft, due_date: e.target.value })}
+                value={draft.data_entrega}
+                onChange={(e) => setDraft({ ...draft, data_entrega: e.target.value })}
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="due_time">Horário</Label>
+              <Label htmlFor="hora_entrega">Horário</Label>
               <Input
-                id="due_time"
+                id="hora_entrega"
                 type="time"
-                value={draft.due_time}
-                onChange={(e) => setDraft({ ...draft, due_time: e.target.value })}
+                value={draft.hora_entrega}
+                onChange={(e) => setDraft({ ...draft, hora_entrega: e.target.value })}
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="description">Descrição</Label>
+            <Label htmlFor="descricao">Descrição</Label>
             <Textarea
-              id="description"
+              id="descricao"
               maxLength={500}
               rows={3}
-              value={draft.description}
-              onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+              value={draft.descricao}
+              onChange={(e) => setDraft({ ...draft, descricao: e.target.value })}
               placeholder="Detalhes, requisitos, links..."
             />
           </div>

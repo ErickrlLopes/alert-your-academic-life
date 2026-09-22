@@ -55,7 +55,7 @@ const estilos: Record<string, { rotulo: string; classe: string }> = {
 };
 
 function badgeOf(activity: Activity) {
-  if (activity.completed) return estilos["concluida"]!;
+  if (activity.concluida) return estilos["concluida"]!;
   if (isLate(activity)) return estilos["atrasada"]!;
   if (isToday(activity)) return estilos["hoje"]!;
   return estilos["proxima"]!;

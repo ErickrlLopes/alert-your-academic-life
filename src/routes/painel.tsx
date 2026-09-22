@@ -51,8 +51,8 @@ function PainelPage() {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("full_name")
+        .from("perfis")
+        .select("nome_completo")
         .eq("id", user!.id)
         .maybeSingle();
       if (error) throw error;
@@ -65,9 +65,9 @@ function PainelPage() {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("activities")
+        .from("atividades")
         .select("*")
-        .order("due_date", { ascending: true });
+        .order("data_entrega", { ascending: true });
       if (error) throw error;
       return data as Activity[];
     },
@@ -76,8 +76,8 @@ function PainelPage() {
   const createActivity = useMutation({
     mutationFn: async (draft: ActivityDraft) => {
       const { error } = await supabase
-        .from("activities")
-        .insert({ ...draft, user_id: user!.id });
+        .from("atividades")
+        .insert({ ...draft, usuario_id: user!.id });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -91,10 +91,10 @@ function PainelPage() {
   const toggleActivity = useMutation({
     mutationFn: async (activity: Activity) => {
       const { error } = await supabase
-        .from("activities")
+        .from("atividades")
         .update({
-          completed: !activity.completed,
-          completed_at: activity.completed ? null : new Date().toISOString(),
+          concluida: !activity.concluida,
+          concluida_em: activity.concluida ? null : new Date().toISOString(),
         })
         .eq("id", activity.id);
       if (error) throw error;
@@ -105,7 +105,7 @@ function PainelPage() {
 
   const deleteActivity = useMutation({
     mutationFn: async (activity: Activity) => {
-      const { error } = await supabase.from("activities").delete().eq("id", activity.id);
+      const { error } = await supabase.from("atividades").delete().eq("id", activity.id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -121,7 +121,7 @@ function PainelPage() {
       hoje: sorted.filter(isToday),
       proximas: sorted.filter(isUpcoming),
       atrasadas: sorted.filter(isLate),
-      concluidas: sorted.filter((a) => a.completed),
+      concluidas: sorted.filter((a) => a.concluida),
     };
   }, [activities]);
 
@@ -139,7 +139,7 @@ function PainelPage() {
     navigate({ to: "/entrar", replace: true });
   }
 
-  const firstName = (profile?.full_name || user?.email?.split("@")[0] || "estudante")
+  const firstName = (profile?.nome_completo || user?.email?.split("@")[0] || "estudante")
     .split(" ")[0];
 
   if (loading || !session) {

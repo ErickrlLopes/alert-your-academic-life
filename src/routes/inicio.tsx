@@ -76,8 +76,8 @@ function InicioPage() {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("full_name")
+        .from("perfis")
+        .select("nome_completo")
         .eq("id", user!.id)
         .maybeSingle();
       if (error) throw error;
@@ -90,9 +90,9 @@ function InicioPage() {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("activities")
+        .from("atividades")
         .select("*")
-        .order("due_date", { ascending: true });
+        .order("data_entrega", { ascending: true });
       if (error) throw error;
       return data as Activity[];
     },
@@ -101,8 +101,8 @@ function InicioPage() {
   const createActivity = useMutation({
     mutationFn: async (draft: ActivityDraft) => {
       const { error } = await supabase
-        .from("activities")
-        .insert({ ...draft, user_id: user!.id });
+        .from("atividades")
+        .insert({ ...draft, usuario_id: user!.id });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -116,10 +116,10 @@ function InicioPage() {
   const toggleActivity = useMutation({
     mutationFn: async (activity: Activity) => {
       const { error } = await supabase
-        .from("activities")
+        .from("atividades")
         .update({
-          completed: !activity.completed,
-          completed_at: activity.completed ? null : new Date().toISOString(),
+          concluida: !activity.concluida,
+          concluida_em: activity.concluida ? null : new Date().toISOString(),
         })
         .eq("id", activity.id);
       if (error) throw error;
@@ -130,17 +130,17 @@ function InicioPage() {
 
   const { hoje, atrasadas, concluidas, lista, proximo } = useMemo(() => {
     const sorted = [...activities].sort(sortByDue);
-    const pendentes = sorted.filter((a) => !a.completed);
+    const pendentes = sorted.filter((a) => !a.concluida);
     return {
       hoje: sorted.filter(isToday).length,
       atrasadas: sorted.filter(isLate).length,
-      concluidas: sorted.filter((a) => a.completed).length,
-      lista: [...pendentes, ...sorted.filter((a) => a.completed)].slice(0, 6),
+      concluidas: sorted.filter((a) => a.concluida).length,
+      lista: [...pendentes, ...sorted.filter((a) => a.concluida)].slice(0, 6),
       proximo: pendentes[0] ?? null,
     };
   }, [activities]);
 
-  const firstName = (profile?.full_name || user?.email?.split("@")[0] || "estudante").split(" ")[0];
+  const firstName = (profile?.nome_completo || user?.email?.split("@")[0] || "estudante").split(" ")[0];
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
@@ -196,9 +196,9 @@ function InicioPage() {
         {proximo && (
           <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-accent p-6 text-primary-foreground shadow-brand">
             <p className="text-sm/relaxed opacity-90">Próximo prazo</p>
-            <h2 className="mt-1 text-2xl font-semibold">{proximo.title}</h2>
+            <h2 className="mt-1 text-2xl font-semibold">{proximo.titulo}</h2>
             <p className="mt-2 text-sm opacity-90">
-              {proximo.subject ? `${proximo.subject} · ` : ""}
+              {proximo.disciplina ? `${proximo.disciplina} · ` : ""}
               {formatDue(proximo)}
             </p>
           </section>
@@ -235,7 +235,7 @@ function InicioPage() {
                     <button
                       className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted"
                       onClick={() => toggleActivity.mutate(item)}
-                      aria-label={item.completed ? "Reabrir atividade" : "Concluir atividade"}
+                      aria-label={item.concluida ? "Reabrir atividade" : "Concluir atividade"}
                     >
                       {statusOf(item) === "concluida" ? (
                         <CheckCircle2 className="size-5 text-success" />
@@ -246,13 +246,13 @@ function InicioPage() {
                     <div className="min-w-0 flex-1">
                       <p
                         className={`truncate font-medium ${
-                          item.completed ? "text-muted-foreground line-through" : ""
+                          item.concluida ? "text-muted-foreground line-through" : ""
                         }`}
                       >
-                        {item.title}
+                        {item.titulo}
                       </p>
                       <p className="mt-0.5 truncate text-sm text-muted-foreground">
-                        {item.subject ? `${item.subject} · ` : ""}
+                        {item.disciplina ? `${item.disciplina} · ` : ""}
                         {formatDue(item)}
                       </p>
                     </div>

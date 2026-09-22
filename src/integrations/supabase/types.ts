@@ -14,66 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
-      activities: {
+      atividades: {
         Row: {
-          completed: boolean
-          completed_at: string | null
-          created_at: string
-          description: string
-          due_date: string
-          due_time: string
+          concluida: boolean
+          concluida_em: string | null
+          criado_em: string
+          data_entrega: string
+          descricao: string
+          disciplina: string
+          hora_entrega: string
           id: string
-          priority: Database["public"]["Enums"]["activity_priority"]
-          subject: string
-          title: string
-          type: Database["public"]["Enums"]["activity_type"]
-          user_id: string
+          prioridade: Database["public"]["Enums"]["prioridade_atividade"]
+          tipo: Database["public"]["Enums"]["tipo_atividade"]
+          titulo: string
+          usuario_id: string
         }
         Insert: {
-          completed?: boolean
-          completed_at?: string | null
-          created_at?: string
-          description?: string
-          due_date: string
-          due_time?: string
+          concluida?: boolean
+          concluida_em?: string | null
+          criado_em?: string
+          data_entrega: string
+          descricao?: string
+          disciplina?: string
+          hora_entrega?: string
           id?: string
-          priority?: Database["public"]["Enums"]["activity_priority"]
-          subject?: string
-          title: string
-          type?: Database["public"]["Enums"]["activity_type"]
-          user_id: string
+          prioridade?: Database["public"]["Enums"]["prioridade_atividade"]
+          tipo?: Database["public"]["Enums"]["tipo_atividade"]
+          titulo: string
+          usuario_id: string
         }
         Update: {
-          completed?: boolean
-          completed_at?: string | null
-          created_at?: string
-          description?: string
-          due_date?: string
-          due_time?: string
+          concluida?: boolean
+          concluida_em?: string | null
+          criado_em?: string
+          data_entrega?: string
+          descricao?: string
+          disciplina?: string
+          hora_entrega?: string
           id?: string
-          priority?: Database["public"]["Enums"]["activity_priority"]
-          subject?: string
-          title?: string
-          type?: Database["public"]["Enums"]["activity_type"]
-          user_id?: string
+          prioridade?: Database["public"]["Enums"]["prioridade_atividade"]
+          tipo?: Database["public"]["Enums"]["tipo_atividade"]
+          titulo?: string
+          usuario_id?: string
         }
         Relationships: []
       }
-      profiles: {
+      perfis: {
         Row: {
-          created_at: string
-          full_name: string
+          criado_em: string
           id: string
+          nome_completo: string
         }
         Insert: {
-          created_at?: string
-          full_name?: string
+          criado_em?: string
           id: string
+          nome_completo?: string
         }
         Update: {
-          created_at?: string
-          full_name?: string
+          criado_em?: string
           id?: string
+          nome_completo?: string
         }
         Relationships: []
       }
@@ -85,8 +85,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      activity_priority: "baixa" | "media" | "alta"
-      activity_type:
+      prioridade_atividade: "baixa" | "media" | "alta"
+      tipo_atividade:
         | "trabalho"
         | "prova"
         | "seminario"
@@ -221,8 +221,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      activity_priority: ["baixa", "media", "alta"],
-      activity_type: [
+      prioridade_atividade: ["baixa", "media", "alta"],
+      tipo_atividade: [
         "trabalho",
         "prova",
         "seminario",
